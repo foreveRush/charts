@@ -13,6 +13,7 @@ export default class AppWrapper extends Component {
         dc.config.defaultColors(d3.schemeCategory10)
         this.timeLineChart = null;
         this.scrollChart = null;
+        this.dblclickTimer = 0
     }
 
     render() {
@@ -125,6 +126,22 @@ export default class AppWrapper extends Component {
                                 return "black"
                         }
                     })
+                    //if we'll use on "click" and on "dblclick" handlers, then "dblclick" event fires twice "click"
+                    .on("click", () => {
+
+                        if (this.dblclickTimer) {
+                            clearTimeout(this.dblclickTimer);
+                            this.dblclickTimer = 0;
+                            console.log("dblclick on " + actionType)
+
+                        } else {
+                            this.dblclickTimer = setTimeout(() => {
+                                this.dblclickTimer = 0;
+                                console.log("click on " + actionType)
+                            }, 250)
+                        }
+                    })
+                // .on("dblclick", () => console.log("dblclick on " + actionType))
                 // .style("color")
 
                 debugger
