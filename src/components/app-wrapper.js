@@ -4,6 +4,7 @@ import crossfilter from "crossfilter"
 import * as d3 from "d3"
 import {d3Time} from "d3"
 import {testData} from "../data/data-provider"
+import contextMenu from "d3-context-menu"
 
 export default class AppWrapper extends Component {
 
@@ -14,6 +15,12 @@ export default class AppWrapper extends Component {
         this.timeLineChart = null;
         this.scrollChart = null;
         this.dblclickTimer = 0
+    }
+
+    componentDidMount(){
+        d3.select('body').on('click.d3-context-menu', function() {
+            d3.select('.d3-context-menu').style('display', 'none');
+        });
     }
 
     render() {
@@ -64,12 +71,70 @@ export default class AppWrapper extends Component {
                 .x(d3.scaleTime().domain([new Date("2019-04-05T18:00:00.000"), new Date("2019-04-05T18:10:00.000")]))
                 // .elasticY(true)
                 // .x(d3.scaleTime())
-                /*.on("renderlet", chart => {
-                 chart.selectAll("g.rect.stack_0").attr("fill", d => {
-                 debugger
-                 });
-                 debugger
-                 })*/
+                //
+                // onClick callback only works for bar charts with an ordinal X axis, we have timeline
+                .on("pretransition", chart => {
+
+                    chart.selectAll("rect.bar").each(function (d) {
+                        let actionType = Object.values(d.data.value.objs)[0].name;
+
+                        var menu = [
+                            {
+                                title: 'Item #1',
+                                action: object => {
+                                    let data = Object.values(object.data.value.objs)[0];
+                                    alert(`Item #1 clicked!\nID: ${data.id}\nAction: ${data.name}`)
+                                }
+                            },
+                            {
+                                title: 'Item #2',
+                                action: object => {
+                                    let data = Object.values(object.data.value.objs)[0];
+                                    alert(`Item #2 clicked!\nID: ${data.id}\nAction: ${data.name}`)
+                                }
+                            }
+                        ]
+
+                        d3.select(this)
+                            .style("width", 5)
+                            .style("fill", () => {
+                                switch (actionType) {
+                                    case "startGame":
+                                        return "aqua";
+                                    case "kick":
+                                        return "red";
+                                    case "out":
+                                        return "yellow";
+                                    case "goal":
+                                        return "green";
+                                    case "pass":
+                                        return "black";
+                                    case "endGame":
+                                        return "aqua";
+                                    default :
+                                        return "black"
+                                }
+                            })
+                            //if we'll use on "click" and on "dblclick" handlers, then "dblclick" event fires twice "click"
+                            .on("click", () => {
+
+                                if (this.dblclickTimer) {
+                                    clearTimeout(this.dblclickTimer);
+                                    this.dblclickTimer = 0;
+                                    alert("dblclick on " + actionType)
+
+                                } else {
+                                    this.dblclickTimer = setTimeout(() => {
+                                        this.dblclickTimer = 0;
+                                        alert("click on " + actionType)
+                                    }, 250)
+                                }
+                            })
+                            .on('contextmenu', contextMenu(menu))
+
+                    })
+
+                })
 
 
                 .group(group)
@@ -82,7 +147,7 @@ export default class AppWrapper extends Component {
             scrollChart
                 .width(1200)
                 .height(40)
-                .margins({top: 0, right: 20, bottom: 20, left: 20})
+                .margins({top: 0, right: 50, bottom: 20, left: 30})
                 .dimension(dim)
                 .group(group)
                 .x(d3.scaleTime().domain([new Date("2019-04-05T18:00:00.000"), new Date("2019-04-05T18:10:00.000")]))
@@ -103,7 +168,7 @@ export default class AppWrapper extends Component {
             this.timeLineChart = chart;
             this.scrollChart = scrollChart;
 
-            chart.selectAll("rect.bar").each(function (d) {
+            /*chart.selectAll("rect.bar").each(function (d) {
                 let actionType = Object.values(d.data.value.objs)[0].name;
 
                 d3.select(this)
@@ -145,7 +210,7 @@ export default class AppWrapper extends Component {
                 // .style("color")
 
                 debugger
-            })
+            })*/
 
             // let chartBars = chart.selectAll("rect.bar").style("width", 3);
 
