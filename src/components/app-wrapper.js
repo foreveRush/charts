@@ -14,18 +14,23 @@ export default class AppWrapper extends Component {
         dc.config.defaultColors(d3.schemeCategory10)
         this.timeLineChart = null;
         this.scrollChart = null;
-        this.dblclickTimer = 0
+        this.dblclickTimer = 0;
+        this.state = {
+            mounted: false
+        }
     }
 
-    componentDidMount(){
-        d3.select('body').on('click.d3-context-menu', function() {
+    componentDidMount() {
+
+        this.setState({mounted:true})
+        d3.select('body').on('click.d3-context-menu', function () {
             d3.select('.d3-context-menu').style('display', 'none');
         });
     }
 
     render() {
 
-        const {mounted} = this.props;
+        const {mounted} = this.state;
 
         if (mounted) {
             let ndx = crossfilter(testData);
@@ -169,48 +174,48 @@ export default class AppWrapper extends Component {
             this.scrollChart = scrollChart;
 
             /*chart.selectAll("rect.bar").each(function (d) {
-                let actionType = Object.values(d.data.value.objs)[0].name;
+             let actionType = Object.values(d.data.value.objs)[0].name;
 
-                d3.select(this)
-                    .style("width", 3)
-                    .style("fill", () => {
-                        switch (actionType) {
-                            case "startGame":
-                                return "aqua";
-                            case "kick":
-                                return "red";
-                            case "out":
-                                return "yellow";
-                            case "goal":
-                                return "green";
-                            case "pass":
-                                return "black";
-                            case "endGame":
-                                return "aqua";
-                            default :
-                                return "black"
-                        }
-                    })
-                    //if we'll use on "click" and on "dblclick" handlers, then "dblclick" event fires twice "click"
-                    .on("click", () => {
+             d3.select(this)
+             .style("width", 3)
+             .style("fill", () => {
+             switch (actionType) {
+             case "startGame":
+             return "aqua";
+             case "kick":
+             return "red";
+             case "out":
+             return "yellow";
+             case "goal":
+             return "green";
+             case "pass":
+             return "black";
+             case "endGame":
+             return "aqua";
+             default :
+             return "black"
+             }
+             })
+             //if we'll use on "click" and on "dblclick" handlers, then "dblclick" event fires twice "click"
+             .on("click", () => {
 
-                        if (this.dblclickTimer) {
-                            clearTimeout(this.dblclickTimer);
-                            this.dblclickTimer = 0;
-                            console.log("dblclick on " + actionType)
+             if (this.dblclickTimer) {
+             clearTimeout(this.dblclickTimer);
+             this.dblclickTimer = 0;
+             console.log("dblclick on " + actionType)
 
-                        } else {
-                            this.dblclickTimer = setTimeout(() => {
-                                this.dblclickTimer = 0;
-                                console.log("click on " + actionType)
-                            }, 250)
-                        }
-                    })
-                // .on("dblclick", () => console.log("dblclick on " + actionType))
-                // .style("color")
+             } else {
+             this.dblclickTimer = setTimeout(() => {
+             this.dblclickTimer = 0;
+             console.log("click on " + actionType)
+             }, 250)
+             }
+             })
+             // .on("dblclick", () => console.log("dblclick on " + actionType))
+             // .style("color")
 
-                debugger
-            })*/
+             debugger
+             })*/
 
             // let chartBars = chart.selectAll("rect.bar").style("width", 3);
 
@@ -220,10 +225,9 @@ export default class AppWrapper extends Component {
         // chart.render()
 
 
-        return (
-            <div id='chart'>
-                {/*<button className="reset">Reset</button>*/}
-            </div>
-        )
+        return [
+            <div id="timeLineChart" key="timeLineChart"/>,
+            <div id="scrollChart" key="scrollChart"/>
+        ]
     }
 }
